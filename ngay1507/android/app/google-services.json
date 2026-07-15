@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "959386847228",
+    "firebase_url": "https://ngay1407-demo-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "ngay1407-demo",
+    "storage_bucket": "ngay1407-demo.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:959386847228:android:2fcfb7f838e4d72e0a1479",
+        "android_client_info": {
+          "package_name": "com.example.ngay1407"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlwEZYWGvdsmkbr8Ho2l0Usc36G3DxPNc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:959386847228:android:008934fc605090b60a1479",
+        "android_client_info": {
+          "package_name": "com.example.ngay1507"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlwEZYWGvdsmkbr8Ho2l0Usc36G3DxPNc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
