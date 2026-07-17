@@ -1,0 +1,87 @@
+1. Giới thiệu Tổng quan
+    - Trong phát triển Flutter, việc xây dựng các lớp dữ liệu (data models) thường gây ra
+    rất nhiều mã lặp (boilerplate). Bạn phải tự tay viết constructor, override toString(),
+    == và hashCode, implement phương thức copyWith, và viết logic chuyển đổi JSON. Công
+    việc này vừa tốn thời gian vừa dễ phát sinh lỗi.
+    - Hai thư viện json_serializable và freezed ra đời để giải quyết vấn đề đó:
+        Thư viện	      |                  Vai trò
+       ===================|============================================================================
+        json_serializable | Tự động tạo code cho việc chuyển đổi object sang JSON
+                          | và ngược lại (fromJson/toJson).
+       ___________________|____________________________________________________________________________
+        freezed	          | Tự động sinh toàn bộ boilerplate cho class bất biến (immutable):
+                          | copyWith, toString(), ==, hashCode và hỗ trợ union types (sealed classes).
+       ===================|============================================================================
+    - Quan trọng nhất: Freezed có thể tích hợp liền mạch với json_serializable để cung cấp
+    một giải pháp toàn diện, giúp code của bạn ngắn gọn, an toàn và dễ bảo trì.
+
+2. Cài đặt (Setup)
+    - Bước 1: Thêm dependencies vào pubspec.yaml
+    Mở file pubspec.yaml và thêm các thư viện sau:
+    yaml
+    dependencies:
+      flutter:
+        sdk: flutter
+
+      # Dùng trong runtime code
+      freezed_annotation: ^2.4.4      # Annotation cho Freezed[reference:6]
+      json_annotation: ^4.9.0         # Annotation cho json_serializable[reference:7]
+
+    dev_dependencies:
+      build_runner: ^2.4.9            # Công cụ chạy code generator[reference:8]
+      freezed: ^2.5.2                 # Code generator cho Freezed[reference:9]
+      json_serializable: ^6.8.0       # Code generator cho JSON[reference:10]
+
+    - Bước 2: Chạy lệnh cài đặt
+        bash
+        flutter pub get
+    - Bước 3: (Khuyến nghị) Cấu hình analysis_options.yaml
+    Để tránh cảnh báo không cần thiết khi dùng chung Freezed và json_serializable,
+    thêm vào file analysis_options.yaml:
+        yaml
+        analyzer:
+          errors:
+            invalid_annotation_target: ignore
+    - Bước 4: Chạy code generator
+    Khi bạn đã viết xong model (hướng dẫn ở phần sau), hãy chạy lệnh sau để sinh code:
+    bash
+    # Chạy một lần
+    flutter pub run build_runner build --delete-conflicting-outputs
+
+    # Hoặc chạy ở chế độ watch (tự động sinh khi có thay đổi)[reference:12]
+    flutter pub run build_runner watch --delete-conflicting-outputs
+    Lệnh này sẽ tạo ra các file phụ trợ: *.freezed.dart (do Freezed sinh) và
+    *.g.dart (do json_serializable sinh).
+
+3. Các tính năng nâng cao (Advanced Features)
+3.1. Union Types (Sealed Classes) - Ví dụ State Management
+    - Union Types (hay còn gọi là Sealed Classes) là một trong những tính năng mạnh mẽ nhất của Freezed.
+    Nó cho phép bạn định nghĩa một kiểu dữ liệu có thể mang nhiều trạng thái khác nhau nhưng tại một
+    thời điểm chỉ có thể là một trạng thái duy nhất.
+    - Tại sao lại cần Union Types?
+      + Trong phát triển ứng dụng (đặc biệt là với BLoC/Cubit), trạng thái của UI thường không chỉ là
+        dữ liệu, mà còn bao gồm các trạng thái như: Đang tải, Đã thành công, hoặc Đã có lỗi.
+      + Thay vì tạo ra nhiều class riêng biệt hoặc dùng các biến kiểm tra phức tạp, Freezed cho phép
+        bạn gom tất cả vào một "cái túi" gọi là AuthState.
+
+3.2. Custom JSON Converter (xử lý kiểu dữ liệu đặc biệt)
+    - Thông thường, thư viện json_serializable chỉ tự động xử lý được các kiểu dữ liệu
+    cơ bản của JSON (String, int, bool, double, List, Map). Tuy nhiên, thực tế API thường
+    trả về dữ liệu ở dạng đặc biệt mà Dart không hiểu trực tiếp, ví dụ như:
+        + Ngày tháng dưới dạng chuỗi (String) thay vì Object DateTime.
+        + Màu sắc dưới dạng mã hex (#FF5733) thay vì Object Color.
+        + Các cấu trúc lồng nhau cần chuyển đổi định dạng trước khi lưu vào App.
+    - @JsonConverter là một "cầu nối" giúp bạn định nghĩa cách chuyển đổi qua lại giữa kiểu dữ liệu
+    phức tạp (trong App) và kiểu dữ liệu đơn giản (trong JSON) một cách tự động.
+
+3.3. Xử lý JSON với tên field khác nhau
+    - Thông thường, thư viện json_serializable sẽ tự động tìm kiếm các trường trong JSON có tên
+    giống hệt tên biến trong class Dart của bạn.
+    - Ví dụ: Nếu trong Dart bạn đặt tên biến là id, thì trong JSON cũng phải có key là "id".
+    - Tuy nhiên, thực tế thường khác biệt:
+        + Quy chuẩn đặt tên: API thường trả về kiểu snake_case (ví dụ: first_name, created_at),
+          trong khi Dart ưu tiên camelCase (ví dụ: firstName, createdAt).
+        + API cũ/Dữ liệu khó hiểu: Đôi khi tên key trong API rất dài hoặc khó hiểu (ví dụ: usr_dtl_id_01),
+          bạn muốn rút gọn nó thành userId trong code Dart để dễ sử dụng hơn.
+        + @JsonKey(name: '...') chính là cách bạn ra lệnh cho trình biên dịch:
+        "Mặc dù trong code tôi gọi biến này là id, nhưng khi đọc JSON, hãy tìm cái key có tên là product_id nhé."

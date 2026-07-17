@@ -1,0 +1,28 @@
+1. GIỚI THIỆU
+    HTTP (Hypertext Transfer Protocol) là giao thức nền tảng cho việc giao tiếp giữa ứng dụng Flutter
+    và các dịch vụ backend. Hầu hết các ứng dụng di động đều cần:
+    - Lấy dữ liệu từ server (GET)
+    - Gửi dữ liệu lên server (POST)
+    - Cập nhật dữ liệu (PUT/PATCH)
+    - Xóa dữ liệu (DELETE)
+    Dart và Flutter cung cấp các công cụ mạnh mẽ cho việc này, phổ biến nhất là gói http và gói dio.
+
+2. CÀI ĐẶT
+Thêm gói http vào pubspec.yaml
+    yaml
+    dependencies:
+      flutter:
+        sdk: flutter
+      http: ^1.1.0   # Phiên bản mới nhất tại thời điểm viết[reference:4]
+
+2.3 Cấp quyền Internet
+- Android – sửa file android/app/src/main/AndroidManifest.xml:
+    xml
+    <!-- Required to fetch data from the internet. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+- iOS – mặc định đã có quyền, không cần thêm.
+- macOS – sửa file macos/Runner/DebugProfile.entitlements và macos/Runner/Release.entitlements:
+    xml
+    <key>com.apple.security.network.client</key>
+    <true/>
+
