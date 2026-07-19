@@ -1,0 +1,55 @@
+1. Bản chất của Interceptor là gì?
+1.1. Khái niệm
+- Interceptor là các lớp trung gian cho phép bạn chặn mọi request (trước khi gửi đi) và mọi response
+  (sau khi nhận về).
+- Trong mô hình kiến trúc phần mềm, nó được gọi là Cross-cutting Concern (vấn đề xuyên suốt) — nghĩa
+  là các thao tác như thêm token, log dữ liệu, xử lý lỗi, hay caching không nên nằm rải rác ở từng
+  Repository mà phải được quản lý tập trung để tránh lặp lại mã nguồn (DRY - Don't Repeat Yourself).
+1.2. Cấu trúc thư mục:
+lib/
+└── data/
+    └── network/
+        ├── dio_client.dart          // File cấu hình chính (Singleton)
+        └── interceptors/            // Nơi chứa tất cả các Interceptor
+            ├── auth_interceptor.dart
+            ├── cache_interceptor.dart
+            └── token_interceptor.dart
+
+2. Các thành phần trong Interceptor (Cơ chế hoạt động)
+Một lớp Interceptor trong Dio kế thừa từ Interceptor và có thể ghi đè (override) 3 phương thức chính:
+    2.1. onRequest(RequestOptions options, RequestInterceptorHandler handler)
+    - Thời điểm: Chạy ngay trước khi yêu cầu được gửi ra mạng.
+    - Công dụng:
+        + Thêm Authorization header.
+        + Thêm Language (ngôn ngữ) hoặc DeviceID.
+        + Thay đổi baseUrl hoặc các tham số truy vấn (queryParameters) tùy theo điều kiện.
+    - Cách điều khiển:
+        + handler.next(options): Cho phép request tiếp tục đi tới server.
+        + handler.resolve(response): Chặn request, không gửi đi nữa mà trả về dữ liệu giả lập ngay
+          lập tức (dùng cho Caching).
+        + handler.reject(error): Chặn request và báo lỗi ngay (ví dụ: phát hiện token đã hết hạn
+          trước khi gửi).
+
+    2.2. onResponse(Response response, ResponseInterceptorHandler handler)
+    - Thời điểm: Chạy sau khi nhận dữ liệu từ server nhưng trước khi dữ liệu đó đến tay code của bạn
+      (Repository).
+    - Công dụng:
+        + "Bóc tách" dữ liệu: Nếu server luôn trả về một bọc { "data": {...}, "message": "..." }, bạn
+           có thể chỉ lấy phần data trả về cho UI.
+        + Logging kết quả.
+    - Cách điều khiển:
+        + handler.next(response): Chuyển dữ liệu đến cho Repository.
+
+    2.3. onError(DioException err, ErrorInterceptorHandler handler)
+    - Thời điểm: Chạy khi request thất bại (ví dụ: lỗi mạng, server trả về mã lỗi 4xx, 5xx).
+    - Công dụng:
+        + Xử lý lỗi 401 (Unauthorized): Tự động gọi API refresh_token.
+        + Thông báo lỗi (Toast/Dialog) một cách tập trung.
+    - Cách điều khiển:
+        + handler.next(err): Tiếp tục truyền lỗi cho Repository xử lý.
+        + handler.resolve(response): Sau khi refresh token thành công, bạn có thể gọi lại request cũ
+          và trả về response thành công cho Repository (người dùng sẽ không biết là đã từng có lỗi xảy ra).
+
+3. Tại sao nên dùng Interceptor?
+- Tách biệt logic xử lý hạ tầng (infrastructure) khỏi logic nghiệp vụ (business logic).
+- Dễ dàng bảo trì và mở rộng hệ thống.

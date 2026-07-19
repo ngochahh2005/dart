@@ -1,0 +1,32 @@
+1. Giới thiệu về Dio
+1.1. Khái niệm Dio
+Dio là một HTTP client mạnh mẽ cho Dart và Flutter, được phát triển bởi JianyingLi. Đây là thư viện network
+phổ biến nhất trong hệ sinh thái Flutter, vượt xa package http cơ bản của Dart với nhiều tính năng nâng cao.
+
+1.2. Các tính năng chính của Dio
+Dio hỗ trợ đầy đủ các tính năng cần thiết cho một ứng dụng thực tế:
+- RESTful API: Hỗ trợ đầy đủ các phương thức HTTP (GET, POST, PUT, DELETE, PATCH)
+- Interceptors: Đánh chặn request/response để xử lý token, logging, caching
+- FormData: Hỗ trợ upload file và gửi dữ liệu dạng form
+- Request Cancellation: Hủy request đang chạy
+- Timeout handling: Cấu hình timeout cho connection và receive
+- Progress notifications: Theo dõi tiến trình upload/download
+- Cookie management: Quản lý cookie tự động
+- Custom adapters: Hỗ trợ tùy chỉnh adapter
+
+2. Cài đặt và cấu hình ban đầu
+2.1. Thêm dependency trong file pubspec.yaml
+    dependencies:
+      dio: ^5.10.0
+2.2. Cấu hình permissions
+- Android (android/app/src/main/AndroidManifest.xml):
+    <uses-permission android:name="android.permission.INTERNET"/>
+- iOS (ios/Runner/Info.plist):
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+    </dict>
+- Lưu ý: Trong production, nên cấu hình cụ thể NSExceptionDomains thay vì bật NSAllowsArbitraryLoads.
+
+

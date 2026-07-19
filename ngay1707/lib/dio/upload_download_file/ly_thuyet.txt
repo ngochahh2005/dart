@@ -1,0 +1,22 @@
+Việc xử lý File (Upload/Download) là một tính năng nâng cao trong Networking. Trong Flutter, các tác
+vụ này yêu cầu xử lý luồng dữ liệu (stream) và thường tốn thời gian, vì vậy cần được tách biệt khỏi UI.
+
+1. Lý thuyết cốt lõi
+- FormData: Là chuẩn HTTP để gửi dữ liệu phức tạp (như file, ảnh) thay vì chỉ gửi JSON thông thường.
+  Nó giúp đóng gói file kèm theo các thông tin bổ sung (tên file, content-type).
+- MultipartFile: Đối tượng đại diện cho file vật lý trên thiết bị mà Dio có thể đọc và gửi lên server.
+- Progress Tracking (onSendProgress, onReceiveProgress): Đây là callback giúp bạn theo dõi tiến trình
+  truyền tải dữ liệu theo thời gian thực ($sent/total$). Dữ liệu này dùng để hiển thị LinearProgressIndicator
+  (thanh tiến trình) trên màn hình.
+
+2. Vị trí đặt code trong dự án
+Giống như các API thông thường, bạn nên đặt các hàm này vào Repository.Cấu trúc thư mục:
+lib/
+├── data/
+│   ├── repositories/
+│   │   └── file_repository.dart  // Nơi chứa các hàm upload/download
+│   └── network/
+│       └── dio_client.dart       // Cấu hình Dio
+└── ui/
+    └── screens/
+        └── upload_screen.dart    // Nơi hiển thị thanh tiến trình (%)
