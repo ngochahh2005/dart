@@ -1,0 +1,292 @@
+1. RETROFIT LÀ GÌ?
+Retrofit là một type-safe HTTP client generator cho Dart/Flutter, được xây dựng trên nền tảng của Dio
+(một HTTP client mạnh mẽ cho Dart).
+Retrofit cho phép bạn định nghĩa các API endpoint dưới dạng abstract class với các annotation (chú thích),
+sau đó tự động sinh code triển khai tương ứng. Nó được lấy cảm hứng từ thư viện Retrofit nổi tiếng của
+Android (Square) và Chopper.
+
+@RestApi(baseUrl: 'https://api.example.com/')
+abstract class ApiClient {
+  factory ApiClient(Dio dio) = _ApiClient;
+
+  @GET('/users')
+  Future<List<User>> getUsers();
+}
+
+Sau khi chạy build_runner, file api_client.g.dart sẽ được sinh ra, chứa toàn bộ code triển khai cho
+các phương thức API.
+
+2. TẠI SAO NÊN SỬ DỤNG RETROFIT
+
+            Lợi ích	                   |                        Mô tả
+=======================================|==================================================================
+Giảm boilerplate code	               | Không cần viết mã lặp lại cho mỗi request
+Type-safe	                           | Phát hiện lỗi tại compile-time, giảm runtime errors
+Tự động serialization/deserialization  | Tự động chuyển đổi JSON ↔ Dart object
+Dễ bảo trì	                           | Mỗi endpoint được định nghĩa tại một nơi duy nhất
+Tích hợp với Dio	                   | Tận dụng toàn bộ sức mạnh của Dio (interceptors, timeout, etc.)
+Dễ đọc và tổ chức	                   | Code rõ ràng, có cấu trúc
+
+3. CÀI ĐẶT VÀ CẤU HÌNH
+3.1 Thêm dependencies vào pubspec.yaml
+dependencies:
+  flutter:
+    sdk: flutter
+  dio: ^5.4.0
+  retrofit: ^4.9.2
+  json_annotation: ^4.9.0
+  logger: ^2.6.0
+  freezed_annotation: ^3.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  build_runner: ^2.4.9
+  freezed: ^3.0.0
+  retrofit_generator: ^10.2.7
+  json_serializable: ^6.8.0
+
+Giải thích các package:
+- dio: HTTP client thực hiện network requests
+- retrofit: Thư viện chính, cung cấp các annotation
+- json_annotation: Cung cấp @JsonSerializable() để generate code serialization
+- retrofit_generator: Sinh code triển khai cho các API interface
+- build_runner: Công cụ chạy code generation
+- json_serializable: Sinh code cho JSON serialization/deserialization
+
+3.2 Cấu hình build.yaml (tùy chọn)
+Tạo file build.yaml ở thư mục gốc dự án để tùy chỉnh hành vi generation:
+targets:
+  $default:
+    builders:
+      retrofit_generator:
+        options:
+          format_output: true          # Thêm // dart format off/on (mặc định: true)
+          auto_cast_response: true     # Tự động cast response type (mặc định: true)
+          empty_request_body: false    # Tạo request body rỗng cho method không params
+          use_result: false            # Sử dụng useResult annotation
+
+3.3 Chạy code generation
+# Chạy một lần
+flutter pub run build_runner build
+
+# Xóa output cũ và build lại (khuyến nghị)
+flutter pub run build_runner build --delete-conflicting-outputs
+
+# Chế độ watch - tự động build khi có thay đổi (khuyến nghị trong development)
+flutter pub run build_runner watch
+
+4. CẤU TRÚC THƯ MỤC DỰ ÁN
+lib/
+├── main.dart
+├── data/
+│   ├── models/
+│   │   ├── user.dart
+│   │   ├── user.g.dart          # Generated bởi json_serializable
+│   │   ├── post.dart
+│   │   └── post.g.dart
+│   └── network/
+│       ├── api_client.dart
+│       ├── api_client.g.dart    # Generated bởi retrofit_generator
+│       ├── dio_client.dart
+│       └── interceptors/
+│           ├── auth_interceptor.dart
+│           └── logging_interceptor.dart
+├── repository/
+│   └── user_repository.dart
+└── ui/
+    ├── screens/
+    └── widgets/
+
+5. CÁC ANNOTATION QUAN TRỌNG
+5.1. @RestApi() – Khai báo Interface gốc
+- Vị trí đặt: Trên cùng của một abstract class.
+- Công dụng: Báo cho Retrofit biết đây là một API Client. Retrofit sẽ dựa vào class này để sinh ra code triển khai (file .g.dart).
+- Tham số quan trọng:
+    + baseUrl (bắt buộc): Đường dẫn gốc (ví dụ: 'https://api.example.com/').
+      Lưu ý cực kỳ quan trọng: Nếu baseUrl không kết thúc bằng dấu / và path ở method bắt đầu không có dấu /, chúng sẽ ghép cứng
+      thành 'https://api.example.comusers' (thiếu dấu gạch chéo) → gây lỗi 404. Luôn để / ở cuối baseUrl hoặc đầu path.
+    + parser (tùy chọn): Dùng để custom cách parse dữ liệu nếu bạn không muốn dùng mặc định.
+- VD:
+    @RestApi(baseUrl: 'https://jsonplaceholder.typicode.com/') // Có dấu / cuối
+    abstract class ApiClient { ... }
+
+5.2. Các HTTP Method (@GET, @POST, @PUT, @PATCH, @DELETE)
+- Vị trí đặt: Trên mỗi method trong abstract class.
+- Công dụng: Xác định loại HTTP request sẽ được gửi lên server.
+- Tham số: Nhận vào một String path (đường dẫn tương đối hoặc tuyệt đối).
+- Chi tiết quan trọng:
+    + Nếu bạn truyền path tuyệt đối bắt đầu bằng http:// hoặc https://, Retrofit sẽ bỏ qua hoàn toàn baseUrl và dùng chính URL đó.
+      Rất hữu ích khi bạn cần gọi một API ngoài phạm vi baseUrl.
+    + Các method này hỗ trợ placeholder trong path, ví dụ: @GET('/users/{id}') (kết hợp với @Path bên dưới).
+- VD:
+    @GET('/posts')              // GET https://api.example.com/posts
+    @POST('/users')             // POST https://api.example.com/users
+    @PUT('/users/{id}')         // PUT với dynamic id
+    @DELETE('/users/{id}')      // DELETE
+
+5.3. @Path() – Tham số động trên URL
+- Vị trí đặt: Trên tham số của method (trong phần () của hàm).
+- Công dụng: Thay thế các {placeholder} trong đường dẫn của @GET, @POST,...
+- Tham số:
+    + Nếu bạn không truyền tên vào @Path() (ví dụ @Path() int id), nó sẽ lấy tên biến làm key để thay thế.
+    + Nếu tên biến khác với tên trong URL, bạn phải chỉ định rõ: @Path('userId') int id.
+- Cơ chế tự động mã hóa: Retrofit/Dio sẽ tự động URL-encode giá trị bạn truyền vào (ví dụ: dấu cách thành %20).
+- Lưu ý bắt buộc: Biến này không được phép là null, nếu không Dio sẽ ném ra lỗi ở runtime.
+- Ví dụ:
+    @GET('/users/{id}/posts')
+    Future<List<Post>> getPostsByUser(@Path('id') int userId);
+    // Nếu gọi getPostsByUser(5) → GET /users/5/posts
+
+5.4. @Query() – Tham số trên thanh URL (Query String)
+- Vị trí đặt: Trên tham số của method.
+- Công dụng: Thêm cặp ?key=value vào cuối URL.
+- Tham số quan trọng: encoded (mặc định là false).
+    + Nếu true: Giá trị của bạn sẽ KHÔNG bị URL-encode. Dùng khi bạn đã tự encode sẵn hoặc muốn gửi ký tự đặc biệt
+      (VD: dấu , hoặc {} trong JSON query).
+    + Nếu false (mặc định): Tự động encode an toàn.
+- Hỗ trợ List/Array:
+    + Nếu bạn truyền List<String> tags, Dio sẽ tự động convert thành ?tags=1&tags=2&tags=3.
+    + Nếu bạn cần format dạng ?tags[]=1&tags[]=2, bạn phải dùng @QueryMap() hoặc xử lý thủ công.
+- Ví dụ:
+    @GET('/posts')
+    Future<List<Post>> getPosts({
+      @Query('_page') int page,
+      @Query('_limit') int limit,
+      @Query('q') String? search, // Có thể null, nếu null sẽ bỏ qua param này
+    });
+    // Gọi: getPosts(page: 1, limit: 10) → /posts?_page=1&_limit=10
+
+5.5. @Body() – Request body dạng JSON
+- Vị trí đặt: Trên tham số của method (thường là một Object hoặc Map).
+- Công dụng: Gửi dữ liệu trong phần thân (body) của request với Content-Type: application/json.
+- Cơ chế: Retrofit + Dio sẽ tự động gọi phương thức toJson() của object bạn truyền vào (nhờ json_serializable) để chuyển thành Map,
+  sau đó encode sang JSON string và gửi lên server.
+- Tham số encoded (ít dùng nhưng quan trọng):
+    + Nếu @Body(encoded: true), bạn bắt buộc phải truyền vào một Map<String, dynamic> hoặc String đã được JSON encode sẵn,
+    và Dio sẽ gửi nguyên xi chuỗi đó mà không xử lý thêm.
+- VD:
+    @POST('/users')
+    Future<User> createUser(@Body() User user);
+    // Body gửi lên: {"id":0, "name":"John", "email":"..."}
+
+5.6. @Field() – Form field (dành riêng cho x-www-form-urlencoded)
+- Vị trí đặt: Trên tham số của method.
+- Công dụng: Gửi dữ liệu dưới dạng HTML Form (application/x-www-form-urlencoded). Dữ liệu sẽ được encode thành key1=value1&key2=value2.
+- Điều kiện bắt buộc: Phải đặt @FormUrlEncoded() ở trên method. Nếu thiếu annotation này, @Field() sẽ bị bỏ qua và gây lỗi.
+- Khác biệt với @Body():
+    + @Body() gửi JSON object (có cấu trúc lồng nhau).
+    + @Field() gửi phẳng (flat) như form HTML, không hỗ trợ object lồng nhau phức tạp (trừ khi bạn tự parse).
+- Tham số encoded: Tương tự @Query(), cho phép bạn kiểm soát việc mã hóa.
+- VD:
+    @POST('/login')
+    @FormUrlEncoded()
+    Future<String> login(
+      @Field('username') String user,
+      @Field('password') String pass,
+    );
+    // Body: username=admin&password=123456
+
+5.7. @Part() – Multipart part (dùng để upload file)
+- Vị trí đặt: Trên tham số của method.
+- Công dụng: Đại diện cho một phần (part) trong request multipart/form-data. Thường dùng để upload file
+  hoặc gửi kèm dữ liệu text trong cùng một request.
+- Điều kiện bắt buộc: Phải đặt @MultiPart() ở trên method.
+- Phân biệt 2 loại dùng @Part():
+    1. Upload file: Tham số phải là kiểu MultipartFile.
+        @Part() MultipartFile file
+    2. Gửi text kèm theo: Bạn phải truyền tên field.
+        @Part('description') String desc
+- Lưu ý cực kỳ quan trọng: Nếu bạn để trống tên @Part() (tức @Part() MultipartFile file),
+  Retrofit sẽ lấy tên biến (file) làm tên field trong form. Nếu bạn muốn đặt tên khác, ghi rõ @Part('avatar').
+- VD:
+    @POST('/upload')
+    @MultiPart()
+    Future<String> uploadFile({
+      @Part('file') required MultipartFile file,
+      @Part('folder') required String folderName,
+    });
+
+5.8. @Headers() – Header động (truyền qua tham số)
+- Vị trí đặt: Đặt trên tham số của method (không phải trên class, và không phải trên method).
+- Công dụng: Truyền giá trị header một cách linh hoạt, động (dynamic) vào request thông qua tham số được truyền vào khi gọi hàm.
+- Phân biệt với @Headers (số nhiều):
+    + @Header (số ít): Dùng cho header thay đổi theo từng lần gọi
+      (ví dụ: Token xác thực riêng của từng người dùng, mã thiết bị, ngôn ngữ theo phiên).
+    + @Headers (số nhiều): Dùng cho nhóm header tĩnh, cố định được khai báo sẵn trên đầu method.
+- Cú pháp: Khai báo kiểu dữ liệu của tham số (thường là String) kèm theo annotation @Header('Tên-Header')
+  gắn liền với tên biến tham số.
+- VD:
+    @GET('/profile')
+    Future<User> getUserProfile(
+      @Header('Authorization') String token,
+      @Header('X-Device-Id') String deviceId,
+    );
+
+5.9. @FormUrlEncoded() – Báo hiệu gửi dữ liệu dạng Form
+- Vị trí đặt: Trên method.
+- Công dụng: Đây là một annotation đánh dấu (Marker). Nó không nhận tham số nào. Khi Retrofit thấy nó,
+  nó sẽ tự động set Content-Type: application/x-www-form-urlencoded và cho phép các tham số có @Field() hoạt động.
+- Lưu ý: Không được dùng chung @FormUrlEncoded() với @MultiPart() hoặc @Body() trong cùng một method.
+
+5.10. @MultiPart() – Báo hiệu gửi dữ liệu dạng Multipart
+- Vị trí đặt: Trên method.
+- Công dụng: Là annotation đánh dấu để gửi request dạng multipart/form-data (thường dùng khi có file).
+  Retrofit sẽ tự động set Content-Type: multipart/form-data; boundary=....
+- Hỗ trợ tiến trình (Progress): Khi dùng @MultiPart(), bạn có thể thêm tham số OnSendProgress vào cuối method
+  để theo dõi tiến trình upload (cực kỳ hữu ích cho UX).
+- Ví dụ có progress:
+    @POST('/upload-large')
+    @MultiPart()
+    Future<String> uploadLargeFile(
+      @Part() MultipartFile file,
+      @CancelRequest() CancelToken cancelToken, // Hủy upload giữa chừng
+      @SendProgress() ProgressCallback? onSendProgress, // Callback báo %
+    );
+
+6. API CLIENT VỚI RESPONSE WRAPPER (XỬ LÝ API CÓ WRAPPER)
+6.1. Khái niệm về API Response Wrapper
+Trong thực tế phát triển phần mềm, các hệ thống Backend (Java Spring Boot, Node.js,...) thường không trả về dữ liệu thô
+(như một danh sách User hay một đối tượng đơn lẻ) trực tiếp, mà sẽ bọc (wrap) dữ liệu đó bên trong một cấu trúc JSON chung thống nhất.
+Cấu trúc này thường bao gồm trạng thái thành công/thất bại, thông báo từ server và phần dữ liệu chính.
+
+Ví dụ về một JSON chuẩn từ server:
+    {
+      "success": true,
+      "message": "Lấy dữ liệu thành công",
+      "data": [
+        { "id": 1, "name": "Nguyen Van A" }
+      ]
+    }
+
+6.2. Chi tiết từng thành phần trong code
+    a. Định nghĩa trong ApiClient
+        @GET('/users')
+        Future<ApiResponse<List<User>>> getUsers();
+    - Thay vì trả về trực tiếp Future<List<User>>, hàm này trả về Future<ApiResponse<List<User>>>.
+    - Kiểu dữ liệu T trong wrapper sẽ đóng vai trò là List<User>, giúp hứng trọn vẹn cả cục JSON chuẩn gồm trạng thái và thông báo.
+    b. Lớp Wrapper ApiResponse<T>
+        @Freezed(genericArgumentFactories: true)
+        abstract class ApiResponse<T> with _$ApiResponse<T> {
+          const factory ApiResponse({
+            required bool success,
+            required String message,
+            T? data,
+          }) = _ApiResponse;
+
+          ...
+        }
+    - @Freezed(genericArgumentFactories: true): Đây là cấu hình bắt buộc khi viết một lớp Generic Class (<T>) bằng Freezed.
+      Nó báo cho bộ sinh mã biết lớp này chứa kiểu dữ liệu linh hoạt chưa xác định trước, đồng thời tự động sinh ra các
+      phương thức chuyển đổi (bao gồm cả toJson ẩn bên trong file .g.dart mà bạn không cần phải tự viết thủ công).
+    - Các trường dữ liệu (success, message, data): Đại diện cho 3 phần tiêu chuẩn của response. Trường data mang kiểu T?
+      vì nó có thể chứa bất kỳ đối tượng nào (như User, List<User>, Post,...) hoặc trả về giá trị null khi server báo lỗi.
+    c. Hàm giải mã fromJson hỗ trợ Generic
+        factory ApiResponse.fromJson(
+            Map<String, dynamic> json,
+            T Function(Object? json) fromJsonT,
+        ) => _$ApiResponseFromJson(json, fromJsonT);
+    - Do T là một kiểu dữ liệu tổng quát linh hoạt, hàm khởi tạo fromJson cần nhận thêm một hàm callback fromJsonT.
+    - Hàm callback này chịu trách nhiệm chỉ dẫn cho chương trình cách giải mã dữ liệu thô bên trong trường data
+      thành một đối tượng cụ thể (ví dụ: chuyển thành User.fromJson hay danh sách các Post), giúp quá trình sinh mã tự động
+      hoạt động chính xác tuyệt đối mà không gặp lỗi biên dịch kiểu dữ liệu.
