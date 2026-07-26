@@ -1,0 +1,4 @@
+BÀI TẬP TỔNG HỢP: "MyBookShelf" — Ứng dụng Quản lý Tủ sách Cá nhân
+Ý tưởng ứng dụng
+Một app quản lý sách cá nhân: người dùng đăng nhập, xem danh sách sách lấy từ API (giả lập), lưu sách yêu thích offline (SQLite),
+đồng bộ tiến độ đọc qua Firebase Realtime Database, và tự thêm sách thủ công qua Form.

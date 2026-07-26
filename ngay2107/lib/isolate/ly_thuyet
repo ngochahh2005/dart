@@ -1,0 +1,36 @@
+1. Isolate là gì?
+- Isolate là đơn vị thực thi độc lập trong Dart/Flutter. Tất cả Dart code đều chạy bên trong các isolate,
+  bắt đầu từ main isolate mặc định (còn gọi là UI isolate).
+- Điểm khác biệt quan trọng giữa Isolate và Thread
+  Đặc điểm	      |                      Isolate (Dart)	                         |   Thread (C/C++, Java, Kotlin)
+ =================|==============================================================|==============================================
+  Bộ nhớ	      |  Mỗi isolate có Heap riêng biệt, hoàn toàn không chia sẻ	 |       Các thread chia sẻ chung bộ nhớ
+  Giao tiếp	      |  Chỉ giao tiếp qua message passing (gửi/nhận tin nhắn)	     |   Có thể truy cập trực tiếp vào bộ nhớ chung
+  Cơ chế đồng bộ  |  Không cần lock/mutex do không chia sẻ bộ nhớ	             |   Cần các cơ chế đồng bộ phức tạp
+  Chi phí	      |  Nhẹ hơn, an toàn hơn	                                     |   Nặng hơn, dễ xảy ra lỗi đồng bộ
+- Dart là ngôn ngữ single-thread, nhưng isolate cho phép thực hiện parallelism (song song thực sự),
+  khác với async/await chỉ là concurrency (đồng thời trên cùng một thread).
+
+2. Tại sao cần sử dụng Isolate?
+- Mặc định, Flutter apps thực hiện tất cả công việc trên một isolate duy nhất – main isolate.
+  Khi bạn chạy một tác vụ nặng trên main isolate, nó sẽ block toàn bộ UI, gây ra hiện tượng giật lag (UI jank).
+- Flutter cần vẽ 60 khung hình mỗi giây (trên thiết bị 60Hz). Nếu bất kỳ tác vụ nào mất hơn 16ms
+  (khoảng thời gian giữa hai khung hình), UI sẽ bị giật.
+- Isolate giúp đưa các tác vụ nặng xuống background worker, giữ cho main isolate luôn rảnh để vẽ UI mượt mà.
+- Các trường hợp sử dụng Isolate điển hình:
+  + Đọc dữ liệu từ cơ sở dữ liệu lớn
+  + Parse và giải mã JSON/XML dung lượng lớn
+  + Xử lý hoặc nén ảnh, audio, video
+  + Chuyển đổi định dạng audio/video
+  + Tìm kiếm và lọc trên danh sách lớn hoặc file system
+  + Thực hiện I/O (giao tiếp với database)
+  + Xử lý nhiều request mạng cùng lúc
+  + Sử dụng FFI cần hỗ trợ bất đồng bộ
+
+3. Các cách tạo và sử dụng Isolate trong Flutter
+Có 3 cách chính để tạo isolate trong Flutter/Dart:
+Phương pháp      	    |   API	       | Độ phức tạp   |                 Khi nào dùng
+========================|==============|===============|=============================================
+compute()	            | Flutter API  | Thấp	       | Tác vụ đơn giản, một lần, trả về kết quả
+Isolate.run()	        | Dart API	   | Trung bình	   | Tác vụ một lần, cần xử lý lỗi tốt hơn
+Isolate.spawn() + Ports	| Dart API	   | Cao	       | Giao tiếp hai chiều, tác vụ dài hạn

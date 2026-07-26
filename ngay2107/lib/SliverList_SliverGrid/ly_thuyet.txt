@@ -1,0 +1,49 @@
+1. Tổng quan về Sliver & CustomScrollView
+- Trước khi đi vào SliverList và SliverGrid, bạn cần hiểu "Sliver" là gì.
+  Sliver không phải là một widget độc lập mà là một "mảnh ghép" (piece) của một thanh cuộn (ScrollView).
+  Trong Flutter, ListView và GridView thông thường chiếm toàn bộ không gian cuộn của chúng. Nhưng khi bạn
+  muốn kết hợp nhiều kiểu cuộn khác nhau trên cùng một màn hình (ví dụ: vừa có Header cuộn thu nhỏ, vừa có
+  danh sách dạng hàng, vừa có lưới sản phẩm), bạn KHÔNG THỂ dùng ListView lồng GridView (sẽ bị lỗi xung đột
+  cuộn hoặc hiệu năng cực kém).
+=> Giải pháp: Sử dụng CustomScrollView làm gốc. Nó nhận vào tham số slivers (mảng các Sliver) và quản lý
+   cuộn một cách thống nhất và mượt mà.
+- Vị trí đặt: CustomScrollView thường được đặt trong body của Scaffold hoặc bên trong Container, Expanded (khi trong Column).
+
+2. Lý thuyết chi tiết về SliverList
+- SliverList dùng để hiển thị một danh sách các widget theo chiều dọc (giống ListView nhưng là dành riêng cho CustomScrollView).
+- Cấu trúc (Constructor):
+    const SliverList({
+      Key? key,
+      required SliverChildDelegate delegate,
+    })
+- Thành phần quan trọng: delegate
+  Delegate là nơi quản lý các con (children) của danh sách. Có 2 loại delegate thường dùng:
+  a. SliverChildListDelegate:
+  + Nhận vào một List<Widget> cố định.
+  + Khi nào dùng: Khi số lượng item rất ít, biết trước và không thay đổi (ví dụ: menu cài đặt có 5 mục).
+  + Nhược điểm: Tạo tất cả widget ngay từ đầu (không tối ưu bộ nhớ cho hàng nghìn item).
+  b. SliverChildBuilderDelegate (Khuyến nghị):
+  + Nhận vào một hàm builder: (BuildContext context, int index) => Widget
+  + Chỉ xây dựng những item đang hiển thị trên màn hình (Lazy Loading - Tải chậm).
+  + Tham số quan trọng:
+    o childCount: Số lượng item (nếu null nghĩa là vô hạn).
+    o addAutomaticKeepAlives: true giữ trạng thái của item khi cuộn đi cuộn lại (quan trọng nếu item chứa TextField hoặc Video).
+    o addRepaintBoundaries: true giúp tối ưu hiệu năng vẽ lại.
+
+3. Lý thuyết chi tiết về SliverGrid
+- SliverGrid dùng để hiển thị một lưới các widget (giống GridView nhưng dành cho CustomScrollView).
+- Cấu trúc (Constructor):
+    const SliverGrid({
+      Key? key,
+      required SliverChildDelegate delegate,
+      required SliverGridDelegate gridDelegate,
+    })
+- Thành phần quan trọng:
+  a. delegate: Giống hệt SliverList (dùng SliverChildBuilderDelegate để lazy loading).
+  b. gridDelegate (Bắt buộc): Quyết định cách bố trí lưới. Có 2 loại chính:
+  + SliverGridDelegateWithFixedCrossAxisCount:
+    o Cố định số cột (ví dụ: 2 cột).
+    o Tham số: crossAxisCount (số cột), crossAxisSpacing (khoảng cách cột), mainAxisSpacing (khoảng cách hàng), childAspectRatio (tỉ lệ chiều rộng/cao của mỗi ô).
+  + SliverGridDelegateWithMaxCrossAxisExtent:
+    o Tự động tính số cột dựa trên chiều rộng tối đa cho phép của mỗi item.
+    o Tham số: maxCrossAxisExtent (ví dụ 200 -> nếu màn hình rộng 400 thì có 2 cột).

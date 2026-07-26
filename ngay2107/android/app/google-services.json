@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "72538885033",
+    "firebase_url": "https://mybookshelf-f15e0-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "mybookshelf-f15e0",
+    "storage_bucket": "mybookshelf-f15e0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:72538885033:android:8fe55fe82f46b1aca652b8",
+        "android_client_info": {
+          "package_name": "com.example.ngay2107"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1A6-SAtBPa4p8Cg_Y2jY4M3oCK2bC77o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

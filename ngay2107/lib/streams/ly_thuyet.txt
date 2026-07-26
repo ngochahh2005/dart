@@ -1,0 +1,24 @@
+1. Stream là gì?
+- Stream (Luồng) là một chuỗi các sự kiện bất đồng bộ (asynchronous events) xảy ra theo thời gian.
+- Nó giống như một đường ống nước: Dữ liệu (nước) chảy từ đầu nguồn (Producer) đến cuối nguồn (Consumer) từng giọt một.
+- Phân biệt với Future:
+    + Future trả về một giá trị duy nhất (hoặc lỗi) trong tương lai.
+    + Stream trả về nhiều giá trị (hoặc lỗi) trong tương lai, rải rác theo thời gian (ví dụ: dữ liệu cảm biến, tin nhắn chat,
+      kết quả tìm kiếm theo từng ký tự).
+
+2. Luồng đăng ký (Subscription) – Single vs Broadcast
+- Single-subscription Stream (Mặc định): Chỉ cho phép duy nhất 1 người lắng nghe (listen). Nếu bạn cố gắng listen lần 2,
+  app sẽ bắn lỗi Bad state: Stream has already been listened to. Dùng cho các luồng dữ liệu tuần tự, có logic rõ ràng.
+- Broadcast Stream: Cho phép nhiều người lắng nghe cùng lúc. Bất kỳ ai đăng ký sau cũng nhận được dữ liệu mới phát sinh
+  (không nhận lại dữ liệu cũ). Dùng cho các sự kiện toàn cục (ví dụ: kết nối mạng, thông báo đẩy).
+
+3. Vòng đời (Lifecycle) của một Stream
+- Tạo (Create): Khởi tạo StreamController.
+- Lắng nghe (Listen): Gọi .listen() -> nhận về StreamSubscription.
+- Tạm dừng/Tiếp tục (Pause/Resume): Tạm thời dừng nhận dữ liệu (hữu ích khi scroll).
+- Hủy bỏ (Cancel): Hủy đăng ký, giải phóng tài nguyên (quan trọng để tránh memory leak).
+- Đóng (Close): Đóng StreamController, báo hiệu không còn dữ liệu nữa (onDone sẽ được gọi).
+
+4. Cơ chế vận hành: Sink và Stream
+- Sink (Bồn chứa / Đầu vào): Nơi bạn "nhét" dữ liệu vào đường ống. Dùng controller.sink.add(data).
+- Stream (Đầu ra): Nơi bạn "lắng nghe" dữ liệu chảy ra. Dùng controller.stream.listen((data) => ...).
