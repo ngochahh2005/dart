@@ -1,0 +1,115 @@
+1. Local Notification là gì?
+Local Notification (thông báo cục bộ) là loại thông báo được tạo và gửi trực tiếp từ chính ứng dụng trên thiết bị,
+không cần đến server hay dịch vụ bên thứ ba (như Firebase).
+
+Phân biệt Local Notification vs Push Notification:
+
+    Tiêu chí	      |  Local Notification	                   | Push Notification (Remote)
+======================|========================================|=================================================
+    Nguồn gửi	      |  Chính ứng dụng trên thiết bị	       | Server (FCM, APNs, ...)
+    Cần kết nối mạng  |  ❌ Không cần	                       | ✅ Cần Internet
+    Sử dụng	          |  Nhắc nhở, lịch trình, sự kiện nội bộ  | Thông báo từ server, tin nhắn, quảng cáo
+    Ví dụ	          |  Báo thức, nhắc nhở uống nước	       | Tin nhắn mới, cập nhật từ server
+
+Local Notification thường được dùng cho các mục đích như: nhắc nhở chấm công, đặt lịch cố định, thông báo sự kiện trong app,
+cập nhật cho người dùng.
+
+2. Package flutter_local_notifications
+- Để triển khai Local Notification trong Flutter, package được sử dụng phổ biến nhất là flutter_local_notifications.
+- Đặc điểm nổi bật:
+  + Hỗ trợ đa nền tảng: Android, iOS, macOS, Linux, Windows, Web
+  + Hiển thị thông báo cơ bản
+  + Lên lịch thông báo theo thời gian cụ thể
+  + Thông báo lặp lại theo khoảng thời gian (interval)
+  + Lên lịch hàng ngày theo giờ hoặc hàng tuần theo ngày và giờ
+  + Hỗ trợ âm thanh tùy chỉnh
+  + Xử lý khi người dùng chạm vào thông báo (foreground, background, terminated)
+  + Hủy thông báo theo ID hoặc hủy tất cả
+  + Tùy chỉnh kênh, mức độ quan trọng, độ ưu tiên trên Android
+  + Hỗ trợ nhiều kiểu hiển thị: big picture, big text, inbox, messaging, media
+
+3. Cài đặt & Cấu hình
+3.1. Thêm package vào pubspec.yaml
+    dependencies:
+      flutter:
+        sdk: flutter
+      flutter_local_notifications: ^22.2.0
+      timezone: ^0.11.1                       # hỗ trợ múi giờ khi lên lịch
+      permission_handler: ^12.0.3             # xin quyền runtime (Android 13+)
+
+    Chạy lệnh: flutter pub get
+
+3.2. Cấu hình Android
+Bước 1: Thêm permission vào android/app/src/main/AndroidManifest.xml
+    <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+        <!-- Quyền hiển thị thông báo -->
+        <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+        <!-- Quyền lên lịch chính xác (Android 12+) -->
+        <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+        <!-- Quyền khởi động lại sau khi reboot -->
+        <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
+        <application>
+            <!-- ... -->
+
+            <!-- Receiver cho thông báo (quan trọng) -->
+            <receiver android:exported="false"
+                      android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
+            <receiver android:exported="false"
+                      android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
+                <intent-filter>
+                    <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                    <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                </intent-filter>
+            </receiver>
+        </application>
+    </manifest>
+Bước 2: Cấu hình android/app/build.gradle để hỗ trợ lên lịch chính xác:
+    android {
+        compileSdk = 35
+
+        compileOptions {
+            coreLibraryDesugaringEnabled true
+            sourceCompatibility = JavaVersion.VERSION_17
+            targetCompatibility = JavaVersion.VERSION_17
+        }
+
+        defaultConfig {
+            minSdk = 21
+            targetSdk = 35
+            multiDexEnabled true
+        }
+    }
+
+    dependencies {
+        coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
+    }
+Bước 3: Tạo icon thông báo mặc định: đặt file ảnh vào android/app/src/main/res/drawable/ và tham chiếu trong AndroidManifest.xml:
+<meta-data
+    android:name="com.google.firebase.messaging.default_notification_icon"
+    android:resource="@drawable/ic_notification" />
+
+3.3. Cấu hình iOS
+Bước 1: Thêm quyền vào ios/Runner/Info.plist:
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>fetch</string>
+        <string>remote-notification</string>
+    </array>
+Bước 2: Cập nhật ios/Runner/AppDelegate.swift để xử lý delegate:
+    import UIKit
+    import Flutter
+
+    @UIApplicationMain
+    @objc class AppDelegate: FlutterAppDelegate {
+      override func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+      ) -> Bool {
+        if #available(iOS 10.0, *) {
+          UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
+        }
+        GeneratedPluginRegistrant.register(with: self)
+        return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+      }
+    }

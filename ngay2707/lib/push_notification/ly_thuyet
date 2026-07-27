@@ -1,0 +1,107 @@
+1. Push Notification là gì?
+Push Notification (thông báo đẩy) là những tin nhắn do server đẩy xuống thiết bị client thông qua một
+cổng cloud message (như Firebase Cloud Messaging - FCM), sau đó hiển thị cho người dùng dưới dạng
+thông báo trên màn hình thiết bị.
+
+Tại sao cần Push Notification?
+- Thông báo tự động khi ứng dụng hoàn thành một công việc nào đó
+- Gửi thông tin khuyến mãi, mời tham gia sự kiện đến khách hàng
+- Tăng mức độ tương tác và giữ chân người dùng
+- Cập nhật thông tin real-time cho người dùng
+- Lưu ý quan trọng: Push notification cần có kết nối Internet mới hoạt động được.
+
+2. Cách thức hoạt động
+Luồng hoạt động của Push Notification trong Flutter:
+    Flutter App
+        ⬇
+    Firebase Cloud Messaging (FCM)
+        ⬇
+    APNs (iOS) / FCM (Android)
+        ⬇
+    Thiết bị người dùng
+Các thành phần chính:
+- Firebase Cloud Messaging (FCM): Dịch vụ trung gian nhận message từ server và gửi đến thiết bị
+- APNs (Apple Push Notification service): Hệ thống push notification của Apple dành cho iOS
+- FCM (Android): Hệ thống push notification của Google dành cho Android
+
+3. Các trạng thái của ứng dụng khi nhận thông báo
+Trạng thái |                 Mô tả	                           |                 Cách xử lý
+===========|===================================================|===================================================
+Foreground | Ứng dụng đang mở, hiển thị và đang được sử dụng   |  FCM KHÔNG tự động hiển thị thông báo.
+           |                                                   |  Phải xử lý thủ công qua onMessage
+-----------|---------------------------------------------------|---------------------------------------------------
+Background | Ứng dụng đang mở nhưng ở chế độ nền               |  FCM tự động hiển thị nếu payload
+           | (đã bấm nút Home)                                 |  có notification
+-----------|---------------------------------------------------|---------------------------------------------------
+Terminated | Ứng dụng đã bị đóng hoàn toàn                     |  FCM tự động hiển thị, nhưng cần xử lý
+           | hoặc thiết bị bị khóa	                           |  khi người dùng bấm vào thông báo
+
+Điều kiện tiên quyết để nhận message:
+- Ứng dụng phải được mở ít nhất một lần (để đăng ký với FCM)
+- Trên iOS: nếu người dùng vuốt tắt app, cần mở lại thủ công để background message hoạt động
+- Trên Android: nếu người dùng force-quit app, cần mở lại thủ công
+
+4. Các gói thư viện cần thiết
+4.1 Danh sách dependencies
+Trong file pubspec.yaml:
+    dependencies:
+      flutter:
+        sdk: flutter
+
+      # Firebase Core - BẮT BUỘC để khởi tạo Firebase
+      firebase_core: ^4.12.1
+
+      # Firebase Messaging - BẮT BUỘC để nhận push notification từ FCM
+      firebase_messaging: ^16.4.3
+
+      # Local Notifications - BẮT BUỘC để hiển thị thông báo khi app đang foreground
+      flutter_local_notifications: ^22.2.0
+
+      # Timezone - Khuyến nghị cho lịch trình thông báo chính xác
+      timezone: ^0.11.1
+
+      # Permission Handler - Hỗ trợ xin quyền trên Android 13+
+      permission_handler: ^12.0.3
+
+4.2 Vai trò của từng gói
+    Gói thư viện	             |                       Vai trò
+=================================|==========================================================================
+    firebase_core	             |   Khởi tạo và kết nối với Firebase project
+    firebase_messaging	         |   Nhận message từ FCM, quản lý token, xử lý background
+    flutter_local_notifications	 |   Hiển thị thông báo local (dùng để hiển thị foreground notification)
+    timezone	                 |   Xử lý múi giờ khi lên lịch thông báo
+    permission_handler	         |   Quản lý quyền runtime (đặc biệt quan trọng trên Android 13+)
+
+5. Cấu hình nền tảng (Android & iOS)
+5.1 Cấu hình Firebase chung
+- Bước 1: Tạo Firebase Project
+  + Truy cập Firebase Console (https://console.firebase.google.com/)
+  + Tạo project mới
+  + Thêm ứng dụng Android và iOS
+- Bước 2: Tải file cấu hình
+  + Android: Tải google-services.json đặt vào android/app/
+  + iOS: Tải GoogleService-Info.plist đặt vào ios/Runner/
+5.2 Cấu hình Android
+File android/build.gradle:
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.0.0'
+        classpath 'com.google.gms:google-services:4.3.15'  // Thêm dòng này
+    }
+File android/app/build.gradle:
+    apply plugin: 'com.android.application'
+    apply plugin: 'com.google.gms.google-services'  // Thêm dòng này
+Yêu cầu phiên bản SDK:
+    defaultConfig {
+        minSdkVersion 21  // Tối thiểu 21
+    }
+5.3 Cấu hình iOS
+Trong Xcode:
+    1. Mở ios/Runner.xcworkspace
+    2. Chọn target Runner → Signing & Capabilities
+    3. Bật Push Notifications
+    4. Bật Background Modes → chọn Remote notifications
+Upload APNs Key lên Firebase:
+1. Tạo APNs Key trong Apple Developer Center (https://developer.apple.com/membercenter/index.action)
+2. Vào Firebase Console → Project Settings → Cloud Messaging
+3. Upload file .p8, nhập Key ID và Team ID
+⚠️ Quan trọng: Method swizzling là bắt buộc trên iOS để FCM hoạt động đúng.
