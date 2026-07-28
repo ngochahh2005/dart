@@ -8,8 +8,7 @@ plugins {
 
 android {
     namespace = "com.example.ngay2707"
-    // 2. Sửa minSdk từ flutter.minSdkVersion thành 21
-    compileSdk = 21
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -23,8 +22,9 @@ android {
         applicationId = "com.example.ngay2707"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
+        // 2. Sửa minSdk từ flutter.minSdkVersion thành 23
         minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        targetSdk = 34
         versionCode = flutter.versionCode
         versionName = flutter.versionName
 
