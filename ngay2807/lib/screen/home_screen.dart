@@ -69,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
                 listener: (context, state) {
                   if (state is WeatherLoaded) {
-                    context.push('/weather', extra: state.weather);
+                    context.push(AppRoute.weather.path, extra: state.weather);
                   } else if (state is WeatherError) {
                     ScaffoldMessenger.of(
                       context,
