@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "240213824111",
+    "project_id": "meowcollector-427ce",
+    "storage_bucket": "meowcollector-427ce.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:240213824111:android:05f9d058337c34f543b39a",
+        "android_client_info": {
+          "package_name": "com.example.meow_collector"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxe9AY8_mjsBg4Qi3SN8WDaxwjMb7shhE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
