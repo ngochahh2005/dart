@@ -1,15 +1,13 @@
-import 'dart:math';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:meow_collector/services/auth/auth_service.dart';
+import '../../../services/auth/auth_service.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  final _authService = AuthService();
+  final AuthService _authService;
 
-  AuthBloc() : super(AuthInitial()) {
+  AuthBloc(this._authService) : super(AuthInitial()) {
     on<AuthSubscriptionStarted>((event, emit) {
       _authService.authStateChanges.listen((User? user) {
         if (user != null) {
@@ -24,7 +22,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       try {
         final user = _authService.currentUser;
         if (user != null) {
-          emit(AuthAuthenticated(user));
+          if (user.emailVerified) {
+            emit(AuthAuthenticated(user));
+          } else {
+            await _authService.logout();
+            emit(AuthUnauthenticated());
+          }
         } else {
           final uid = await _authService.getStoredUid();
           if (uid != null) {
@@ -40,11 +43,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthRegister>((event, emit) async {
       emit(AuthLoading());
       try {
-        final userCredential = await _authService.register(
+        await _authService.register(
           email: event.email,
           password: event.password,
         );
-        emit(AuthAuthenticated(userCredential.user!));
+        emit(AuthRegistrationSuccess());
       } catch (e) {
         emit(AuthError(e.toString()));
       }
@@ -56,7 +59,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           email: event.email,
           password: event.password,
         );
-        emit(AuthAuthenticated(userCredential.user!));
+        final user = userCredential.user;
+        if (user != null) {
+          if (user.emailVerified) {
+            emit(AuthAuthenticated(user));
+          } else {
+            await _authService.logout();
+            emit(
+              const AuthError('Please verify your email before logging in!'),
+            );
+          }
+        }
       } catch (e) {
         emit(AuthError(e.toString()));
       }

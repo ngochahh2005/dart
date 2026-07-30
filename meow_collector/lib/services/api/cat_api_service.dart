@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:meow_collector/core/constants/api_endpoints.dart';
-import 'package:meow_collector/models/cat_breed.dart';
-import 'package:meow_collector/models/cat_image.dart';
+import '../../core/constants/api_endpoints.dart';
+import '../../models/cat_breed.dart';
 
 class CatApiService {
   CatApiService._internal() {
@@ -56,30 +55,17 @@ class CatApiService {
       throw Exception('Unknown exception: $e');
     }
   }
-
-  Future<CatImage?> fetchCatImage(String breedId) async {
+  
+  Future<CatBreed> fetchBreedById(String breedId) async {
     try {
-      final resp = await _dio.get(
-        ApiEndpoints.getImageSearchUrl(
-          breedId: breedId,
-          limit: 1,
-          size: 'full',
-        ),
-      );
+      final resp = await _dio.get('${ApiEndpoints.breeds}/$breedId');
       if (resp.statusCode == 200) {
-        final List<dynamic> data = resp.data;
-        if (data.isNotEmpty) {
-          return CatImage.fromJson(data.first as Map<String, dynamic>);
-        } else {
-          return null;
-        }
+        return CatBreed.fromJson(resp.data);
       } else {
-        throw Exception('Fail to load image: ${resp.statusCode}');
+        throw Exception('Failed to load breed details');
       }
-    } on DioException catch (e) {
-      throw Exception('Network Error: ${e.message}');
     } catch (e) {
-      throw Exception('Unknown Error: $e');
+      throw Exception('Error: $e');
     }
   }
 }

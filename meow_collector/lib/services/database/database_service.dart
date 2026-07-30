@@ -17,7 +17,7 @@ class DatabaseService {
     return _database!;
   }
 
-  Future<Database?> _init() async {
+  Future<Database> _init() async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, 'meow_collector.db');
     return await openDatabase(
@@ -25,7 +25,14 @@ class DatabaseService {
       version: 1,
       onCreate: (db, version) async {
         await db.execute(
-          'CREATE TABLE favorites (id TEXT PRIMARY KEY, breed_name TEXT, image_url TEXT, created_at INTEGER)',
+          '''CREATE TABLE favorites (
+              id TEXT PRIMARY KEY, 
+              breedName TEXT, 
+              imageUrl TEXT,
+              breedType TEXT, 
+              createdAt INTEGER
+            )
+          ''',
         );
       },
     );
@@ -33,23 +40,28 @@ class DatabaseService {
 
   Future<void> insertFavoriteCat(FavoriteCat cat) async {
     final db = await database;
-    db.insert(
+    await db.insert(
       'favorites',
       cat.toJson(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
-  Future<void> delete(String id) async {
+  Future<void> deleteFavoriteCat(String id) async {
     final db = await database;
-    db.delete(
+    await db.delete(
       'favorites',
       where: 'id=?',
       whereArgs: [id]
     );
   }
 
-  Future<List<FavoriteCat>> getAll() async {
+  Future<void>deleteAllFavorite() async {
+    final db = await database;
+    await db.delete('favorites');
+  }
+
+  Future<List<FavoriteCat>> getAllFavorites() async {
     final db = await database;
     final List<Map<String, dynamic>> queryRes = await db.query('favorites');
     return queryRes.map((map) => FavoriteCat.fromJson(map)).toList();

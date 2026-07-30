@@ -26,7 +26,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
-          if (state is AuthAuthenticated) {
+          if (state is AuthRegistrationSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Register Successful!'))
+            );
             context.go(AppRoute.login.path);
           }
           if (state is AuthError) {
@@ -104,7 +107,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       Text('Do you already have account?'),
                       TextButton(
                         onPressed: () {
-                          context.push(AppRoute.login.path);
+                          context.go(AppRoute.login.path);
                         },
                         child: Text('Login now!'),
                       ),

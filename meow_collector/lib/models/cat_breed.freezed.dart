@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$CatBreed {
 
- String get id; String get name; String? get referenceImageId; String? get temperament; String? get origin; String? get lifeSpan; String? get description;
+ String get id; String get name;@JsonKey(name: 'reference_image_id') String? get referenceImageId; String? get temperament; String? get origin;@JsonKey(name: 'life_span') String? get lifeSpan; String? get description;
 /// Create a copy of CatBreed
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $CatBreedCopyWith<$Res>  {
   factory $CatBreedCopyWith(CatBreed value, $Res Function(CatBreed) _then) = _$CatBreedCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String? referenceImageId, String? temperament, String? origin, String? lifeSpan, String? description
+ String id, String name,@JsonKey(name: 'reference_image_id') String? referenceImageId, String? temperament, String? origin,@JsonKey(name: 'life_span') String? lifeSpan, String? description
 });
 
 
@@ -159,7 +159,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String? referenceImageId,  String? temperament,  String? origin,  String? lifeSpan,  String? description)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name, @JsonKey(name: 'reference_image_id')  String? referenceImageId,  String? temperament,  String? origin, @JsonKey(name: 'life_span')  String? lifeSpan,  String? description)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CatBreed() when $default != null:
 return $default(_that.id,_that.name,_that.referenceImageId,_that.temperament,_that.origin,_that.lifeSpan,_that.description);case _:
@@ -180,7 +180,7 @@ return $default(_that.id,_that.name,_that.referenceImageId,_that.temperament,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String? referenceImageId,  String? temperament,  String? origin,  String? lifeSpan,  String? description)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name, @JsonKey(name: 'reference_image_id')  String? referenceImageId,  String? temperament,  String? origin, @JsonKey(name: 'life_span')  String? lifeSpan,  String? description)  $default,) {final _that = this;
 switch (_that) {
 case _CatBreed():
 return $default(_that.id,_that.name,_that.referenceImageId,_that.temperament,_that.origin,_that.lifeSpan,_that.description);case _:
@@ -200,7 +200,7 @@ return $default(_that.id,_that.name,_that.referenceImageId,_that.temperament,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String? referenceImageId,  String? temperament,  String? origin,  String? lifeSpan,  String? description)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name, @JsonKey(name: 'reference_image_id')  String? referenceImageId,  String? temperament,  String? origin, @JsonKey(name: 'life_span')  String? lifeSpan,  String? description)?  $default,) {final _that = this;
 switch (_that) {
 case _CatBreed() when $default != null:
 return $default(_that.id,_that.name,_that.referenceImageId,_that.temperament,_that.origin,_that.lifeSpan,_that.description);case _:
@@ -214,16 +214,16 @@ return $default(_that.id,_that.name,_that.referenceImageId,_that.temperament,_th
 /// @nodoc
 @JsonSerializable()
 
-class _CatBreed implements CatBreed {
-  const _CatBreed({required this.id, required this.name, this.referenceImageId, this.temperament, this.origin, this.lifeSpan, this.description});
+class _CatBreed extends CatBreed {
+  const _CatBreed({required this.id, required this.name, @JsonKey(name: 'reference_image_id') this.referenceImageId, this.temperament, this.origin, @JsonKey(name: 'life_span') this.lifeSpan, this.description}): super._();
   factory _CatBreed.fromJson(Map<String, dynamic> json) => _$CatBreedFromJson(json);
 
 @override final  String id;
 @override final  String name;
-@override final  String? referenceImageId;
+@override@JsonKey(name: 'reference_image_id') final  String? referenceImageId;
 @override final  String? temperament;
 @override final  String? origin;
-@override final  String? lifeSpan;
+@override@JsonKey(name: 'life_span') final  String? lifeSpan;
 @override final  String? description;
 
 /// Create a copy of CatBreed
@@ -259,7 +259,7 @@ abstract mixin class _$CatBreedCopyWith<$Res> implements $CatBreedCopyWith<$Res>
   factory _$CatBreedCopyWith(_CatBreed value, $Res Function(_CatBreed) _then) = __$CatBreedCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String? referenceImageId, String? temperament, String? origin, String? lifeSpan, String? description
+ String id, String name,@JsonKey(name: 'reference_image_id') String? referenceImageId, String? temperament, String? origin,@JsonKey(name: 'life_span') String? lifeSpan, String? description
 });
 
 
