@@ -11,30 +11,33 @@ part of 'ingredient.dart';
 
 // dart format off
 T _$identity<T>(T value) => value;
+
 /// @nodoc
 mixin _$Ingredient {
 
- String get name; String get measure;
+@JsonKey(name: 'idIngredient') String? get id;@JsonKey(name: 'strIngredient') String get name;@JsonKey(name: 'strDescription') String? get description; String? get measure;@JsonKey(name: 'strThumb') String? get url;@JsonKey(name: 'strType') String? get type;
 /// Create a copy of Ingredient
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 $IngredientCopyWith<Ingredient> get copyWith => _$IngredientCopyWithImpl<Ingredient>(this as Ingredient, _$identity);
 
+  /// Serializes this Ingredient to a JSON map.
+  Map<String, dynamic> toJson();
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Ingredient&&(identical(other.name, name) || other.name == name)&&(identical(other.measure, measure) || other.measure == measure));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Ingredient&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.measure, measure) || other.measure == measure)&&(identical(other.url, url) || other.url == url)&&(identical(other.type, type) || other.type == type));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,measure);
+int get hashCode => Object.hash(runtimeType,id,name,description,measure,url,type);
 
 @override
 String toString() {
-  return 'Ingredient(name: $name, measure: $measure)';
+  return 'Ingredient(id: $id, name: $name, description: $description, measure: $measure, url: $url, type: $type)';
 }
 
 
@@ -45,7 +48,7 @@ abstract mixin class $IngredientCopyWith<$Res>  {
   factory $IngredientCopyWith(Ingredient value, $Res Function(Ingredient) _then) = _$IngredientCopyWithImpl;
 @useResult
 $Res call({
- String name, String measure
+@JsonKey(name: 'idIngredient') String? id,@JsonKey(name: 'strIngredient') String name,@JsonKey(name: 'strDescription') String? description, String? measure,@JsonKey(name: 'strThumb') String? url,@JsonKey(name: 'strType') String? type
 });
 
 
@@ -62,11 +65,15 @@ class _$IngredientCopyWithImpl<$Res>
 
 /// Create a copy of Ingredient
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? measure = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = null,Object? description = freezed,Object? measure = freezed,Object? url = freezed,Object? type = freezed,}) {
   return _then(_self.copyWith(
-name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,measure: null == measure ? _self.measure : measure // ignore: cast_nullable_to_non_nullable
-as String,
+id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String?,measure: freezed == measure ? _self.measure : measure // ignore: cast_nullable_to_non_nullable
+as String?,url: freezed == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
+as String?,type: freezed == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -151,10 +158,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String name,  String measure)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'idIngredient')  String? id, @JsonKey(name: 'strIngredient')  String name, @JsonKey(name: 'strDescription')  String? description,  String? measure, @JsonKey(name: 'strThumb')  String? url, @JsonKey(name: 'strType')  String? type)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Ingredient() when $default != null:
-return $default(_that.name,_that.measure);case _:
+return $default(_that.id,_that.name,_that.description,_that.measure,_that.url,_that.type);case _:
   return orElse();
 
 }
@@ -172,10 +179,10 @@ return $default(_that.name,_that.measure);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String name,  String measure)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'idIngredient')  String? id, @JsonKey(name: 'strIngredient')  String name, @JsonKey(name: 'strDescription')  String? description,  String? measure, @JsonKey(name: 'strThumb')  String? url, @JsonKey(name: 'strType')  String? type)  $default,) {final _that = this;
 switch (_that) {
 case _Ingredient():
-return $default(_that.name,_that.measure);case _:
+return $default(_that.id,_that.name,_that.description,_that.measure,_that.url,_that.type);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -192,10 +199,10 @@ return $default(_that.name,_that.measure);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String name,  String measure)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'idIngredient')  String? id, @JsonKey(name: 'strIngredient')  String name, @JsonKey(name: 'strDescription')  String? description,  String? measure, @JsonKey(name: 'strThumb')  String? url, @JsonKey(name: 'strType')  String? type)?  $default,) {final _that = this;
 switch (_that) {
 case _Ingredient() when $default != null:
-return $default(_that.name,_that.measure);case _:
+return $default(_that.id,_that.name,_that.description,_that.measure,_that.url,_that.type);case _:
   return null;
 
 }
@@ -204,14 +211,18 @@ return $default(_that.name,_that.measure);case _:
 }
 
 /// @nodoc
-
+@JsonSerializable()
 
 class _Ingredient implements Ingredient {
-  const _Ingredient({required this.name, required this.measure});
-  
+  const _Ingredient({@JsonKey(name: 'idIngredient') this.id, @JsonKey(name: 'strIngredient') required this.name, @JsonKey(name: 'strDescription') this.description, this.measure, @JsonKey(name: 'strThumb') this.url, @JsonKey(name: 'strType') this.type});
+  factory _Ingredient.fromJson(Map<String, dynamic> json) => _$IngredientFromJson(json);
 
-@override final  String name;
-@override final  String measure;
+@override@JsonKey(name: 'idIngredient') final  String? id;
+@override@JsonKey(name: 'strIngredient') final  String name;
+@override@JsonKey(name: 'strDescription') final  String? description;
+@override final  String? measure;
+@override@JsonKey(name: 'strThumb') final  String? url;
+@override@JsonKey(name: 'strType') final  String? type;
 
 /// Create a copy of Ingredient
 /// with the given fields replaced by the non-null parameter values.
@@ -219,20 +230,23 @@ class _Ingredient implements Ingredient {
 @pragma('vm:prefer-inline')
 _$IngredientCopyWith<_Ingredient> get copyWith => __$IngredientCopyWithImpl<_Ingredient>(this, _$identity);
 
-
+@override
+Map<String, dynamic> toJson() {
+  return _$IngredientToJson(this, );
+}
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Ingredient&&(identical(other.name, name) || other.name == name)&&(identical(other.measure, measure) || other.measure == measure));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Ingredient&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.measure, measure) || other.measure == measure)&&(identical(other.url, url) || other.url == url)&&(identical(other.type, type) || other.type == type));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,measure);
+int get hashCode => Object.hash(runtimeType,id,name,description,measure,url,type);
 
 @override
 String toString() {
-  return 'Ingredient(name: $name, measure: $measure)';
+  return 'Ingredient(id: $id, name: $name, description: $description, measure: $measure, url: $url, type: $type)';
 }
 
 
@@ -243,7 +257,7 @@ abstract mixin class _$IngredientCopyWith<$Res> implements $IngredientCopyWith<$
   factory _$IngredientCopyWith(_Ingredient value, $Res Function(_Ingredient) _then) = __$IngredientCopyWithImpl;
 @override @useResult
 $Res call({
- String name, String measure
+@JsonKey(name: 'idIngredient') String? id,@JsonKey(name: 'strIngredient') String name,@JsonKey(name: 'strDescription') String? description, String? measure,@JsonKey(name: 'strThumb') String? url,@JsonKey(name: 'strType') String? type
 });
 
 
@@ -260,11 +274,15 @@ class __$IngredientCopyWithImpl<$Res>
 
 /// Create a copy of Ingredient
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? measure = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? name = null,Object? description = freezed,Object? measure = freezed,Object? url = freezed,Object? type = freezed,}) {
   return _then(_Ingredient(
-name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,measure: null == measure ? _self.measure : measure // ignore: cast_nullable_to_non_nullable
-as String,
+id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String?,measure: freezed == measure ? _self.measure : measure // ignore: cast_nullable_to_non_nullable
+as String?,url: freezed == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
+as String?,type: freezed == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

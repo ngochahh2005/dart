@@ -24,4 +24,6 @@ class DioClient {
 
     return this;
   }
+
+  Dio get client => dio;
 }
