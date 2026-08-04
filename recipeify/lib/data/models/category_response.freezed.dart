@@ -11,16 +11,19 @@ part of 'category_response.dart';
 
 // dart format off
 T _$identity<T>(T value) => value;
+
 /// @nodoc
 mixin _$CategoryResponse {
 
- List<Category> get categories;
+@JsonKey(name: 'categories') List<Category> get categories;
 /// Create a copy of CategoryResponse
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 $CategoryResponseCopyWith<CategoryResponse> get copyWith => _$CategoryResponseCopyWithImpl<CategoryResponse>(this as CategoryResponse, _$identity);
 
+  /// Serializes this CategoryResponse to a JSON map.
+  Map<String, dynamic> toJson();
 
 
 @override
@@ -28,7 +31,7 @@ bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is CategoryResponse&&const DeepCollectionEquality().equals(other.categories, categories));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(categories));
 
@@ -45,7 +48,7 @@ abstract mixin class $CategoryResponseCopyWith<$Res>  {
   factory $CategoryResponseCopyWith(CategoryResponse value, $Res Function(CategoryResponse) _then) = _$CategoryResponseCopyWithImpl;
 @useResult
 $Res call({
- List<Category> categories
+@JsonKey(name: 'categories') List<Category> categories
 });
 
 
@@ -150,7 +153,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<Category> categories)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'categories')  List<Category> categories)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CategoryResponse() when $default != null:
 return $default(_that.categories);case _:
@@ -171,7 +174,7 @@ return $default(_that.categories);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<Category> categories)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'categories')  List<Category> categories)  $default,) {final _that = this;
 switch (_that) {
 case _CategoryResponse():
 return $default(_that.categories);case _:
@@ -191,7 +194,7 @@ return $default(_that.categories);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<Category> categories)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'categories')  List<Category> categories)?  $default,) {final _that = this;
 switch (_that) {
 case _CategoryResponse() when $default != null:
 return $default(_that.categories);case _:
@@ -203,14 +206,14 @@ return $default(_that.categories);case _:
 }
 
 /// @nodoc
-
+@JsonSerializable()
 
 class _CategoryResponse implements CategoryResponse {
-  const _CategoryResponse({final  List<Category> categories = const <Category>[]}): _categories = categories;
-  
+  const _CategoryResponse({@JsonKey(name: 'categories') final  List<Category> categories = const <Category>[]}): _categories = categories;
+  factory _CategoryResponse.fromJson(Map<String, dynamic> json) => _$CategoryResponseFromJson(json);
 
  final  List<Category> _categories;
-@override@JsonKey() List<Category> get categories {
+@override@JsonKey(name: 'categories') List<Category> get categories {
   if (_categories is EqualUnmodifiableListView) return _categories;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_categories);
@@ -223,14 +226,17 @@ class _CategoryResponse implements CategoryResponse {
 @pragma('vm:prefer-inline')
 _$CategoryResponseCopyWith<_CategoryResponse> get copyWith => __$CategoryResponseCopyWithImpl<_CategoryResponse>(this, _$identity);
 
-
+@override
+Map<String, dynamic> toJson() {
+  return _$CategoryResponseToJson(this, );
+}
 
 @override
 bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is _CategoryResponse&&const DeepCollectionEquality().equals(other._categories, _categories));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_categories));
 
@@ -247,7 +253,7 @@ abstract mixin class _$CategoryResponseCopyWith<$Res> implements $CategoryRespon
   factory _$CategoryResponseCopyWith(_CategoryResponse value, $Res Function(_CategoryResponse) _then) = __$CategoryResponseCopyWithImpl;
 @override @useResult
 $Res call({
- List<Category> categories
+@JsonKey(name: 'categories') List<Category> categories
 });
 
 

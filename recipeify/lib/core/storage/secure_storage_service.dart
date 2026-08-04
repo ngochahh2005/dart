@@ -10,7 +10,7 @@ class SecureStorageService {
 
   static const _keyEmail = 'auth_email';
   static const _keyUid = 'auth_uid';
-  static const _keyPin = 'auth_pin';
+  static const _keyPin = 'user_pin';
 
   Future<void> saveUserInfo({required String email, required String uid}) async {
     await _storage.write(key: _keyEmail, value: email);
@@ -30,7 +30,7 @@ class SecureStorageService {
     return await _storage.read(key: _keyPin);
   }
 
-  Future<void> clearPin() async {
+  Future<void> deletePin() async {
     return await _storage.delete(key: _keyPin);
   }
 }

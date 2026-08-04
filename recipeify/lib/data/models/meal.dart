@@ -6,6 +6,8 @@ part 'meal.freezed.dart';
 
 @freezed
 abstract class Meal with _$Meal {
+  const Meal._();
+
   const factory Meal({
     required String id,
     required String name,
@@ -30,6 +32,31 @@ abstract class Meal with _$Meal {
       tags: _parseTags(json['strTags']),
       ingredients: _parseIngredients(json),
     );
+  }
+
+  Map<String, dynamic> toMap() {
+    final map = <String, dynamic> {
+      'idMeal': id,
+      'strMeal': name,
+      'strMealThumb': url,
+      'strInstructions': instructions,
+      'strCategory': category,
+      'strArea': area,
+      'strYoutube': youtubeUrl,
+      'strTags': tags.join(','),
+    };
+
+    for (int i = 1; i <= 20; i++) {
+      if (i <= ingredients.length) {
+        map['strIngredient$i'] = ingredients[i-1].name;
+        map['strMeasure$i'] = ingredients[i-1].measure;
+      } else {
+        map['strIngredient$i'] = '';
+        map['strMeasure$i'] = '';
+      }
+    }
+
+    return map;
   }
 
   static List<String> _parseTags(String? raw) {

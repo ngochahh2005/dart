@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:recipeify/data/models/area.dart';
 import 'package:recipeify/data/models/category_response.dart';
 import 'package:recipeify/data/models/ingredient.dart';
 import 'package:recipeify/data/models/list_response.dart';

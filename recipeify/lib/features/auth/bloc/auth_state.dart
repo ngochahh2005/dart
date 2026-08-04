@@ -21,6 +21,15 @@ class AuthAuthenticated extends AuthState {
   List<Object?> get props => [user];
 }
 
+class AuthRequiresPin extends AuthState {
+  final User user;
+
+  const AuthRequiresPin(this.user);
+
+  @override
+  List<Object?> get props => [user];
+}
+
 class AuthUnauthenticated extends AuthState {}
 
 class AuthRegisterSuccess extends AuthState {}

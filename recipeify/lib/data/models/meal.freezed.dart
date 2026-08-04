@@ -213,8 +213,8 @@ return $default(_that.id,_that.name,_that.url,_that.instructions,_that.category,
 /// @nodoc
 
 
-class _Meal implements Meal {
-  const _Meal({required this.id, required this.name, required this.url, required this.instructions, this.category, this.area, this.youtubeUrl, final  List<String> tags = const <String>[], final  List<Ingredient> ingredients = const <Ingredient>[]}): _tags = tags,_ingredients = ingredients;
+class _Meal extends Meal {
+  const _Meal({required this.id, required this.name, required this.url, required this.instructions, this.category, this.area, this.youtubeUrl, final  List<String> tags = const <String>[], final  List<Ingredient> ingredients = const <Ingredient>[]}): _tags = tags,_ingredients = ingredients,super._();
   
 
 @override final  String id;

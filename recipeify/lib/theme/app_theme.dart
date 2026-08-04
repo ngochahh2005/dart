@@ -108,6 +108,14 @@ class AppTheme {
           return AppColors.lightTextSecondary.withValues(alpha: 0.08);
         }),
       ),
+
+      inputDecorationTheme: InputDecorationTheme(
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+        prefixIconColor: AppColors.lightTextSecondary,
+        suffixIconColor: AppColors.lightTextSecondary,
+      ),
+
+      fontFamily: 'k2d',
     );
   }
 
@@ -214,6 +222,14 @@ class AppTheme {
           return AppColors.darkTextSecondary.withValues(alpha: 0.12);
         }),
       ),
+
+      inputDecorationTheme: InputDecorationTheme(
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+        prefixIconColor: AppColors.lightTextSecondary,
+        suffixIconColor: AppColors.lightTextSecondary,
+      ),
+
+      fontFamily: 'k2d',
     );
   }
 }

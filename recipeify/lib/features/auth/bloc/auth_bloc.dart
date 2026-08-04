@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:recipeify/core/storage/secure_storage_service.dart';
 import 'package:recipeify/data/repositories/auth_repository.dart';
 
 import 'auth_event.dart';
@@ -7,8 +8,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
+  final SecureStorageService _storageService;
 
-  AuthBloc(this._authRepository) : super(AuthInitial()) {
+  AuthBloc(this._authRepository, this._storageService) : super(AuthInitial()) {
     on<AuthSubscriptionStarted>((event, emit) {
       _authRepository.authStateChanges.listen((User? user) {
         if (user != null) {
@@ -25,7 +27,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final user = _authRepository.currentUser;
         if (user != null) {
           if (user.emailVerified) {
-            emit(AuthAuthenticated(user));
+            final pin = await _storageService.getPin();
+            if (pin != null && pin.isNotEmpty) {
+              emit(AuthRequiresPin(user));
+            } else {
+              emit(AuthAuthenticated(user));
+            }
           } else {
             await _authRepository.logout();
             emit(AuthUnauthenticated());
@@ -45,6 +52,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           email: event.email,
           password: event.password,
         );
+
         emit(AuthRegisterSuccess());
       } catch (e) {
         emit(AuthError(e.toString()));
@@ -59,11 +67,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           password: event.password,
         );
         final user = userCredential.user;
-        if (user != null) {
-          emit(AuthAuthenticated(user));
+        if (user != null && user.emailVerified) {
+          final pin = await _storageService.getPin();
+          if (pin != null && pin.isNotEmpty) {
+            emit(AuthRequiresPin(user));
+          } else {
+            emit(AuthAuthenticated(user));
+          }
         } else {
           await _authRepository.logout();
-          emit(AuthError('Please verify your email before logging in!'));
+          emit(AuthError('Vui lòng xác thực email để đăng nhập!'));
         }
       } catch (e) {
         emit(AuthError(e.toString()));
